@@ -68,13 +68,13 @@ public class RobotController : MonoBehaviour
         rb.linearVelocity = v;
     }
 
-    /// Put the robot back at a position with zero velocity and cleared timers.
+    /// Put the robot at a position with a given velocity and cleared timers.
     /// The ghost calls this every loop so it never drifts.
-    public void ResetState(Vector2 position)
+    public void ResetState(Vector2 position, Vector2 velocity)
     {
         rb.position = position;
         transform.position = position;
-        rb.linearVelocity = Vector2.zero;
+        rb.linearVelocity = velocity;
         coyoteCounter = 0;
         bufferCounter = 0;
     }

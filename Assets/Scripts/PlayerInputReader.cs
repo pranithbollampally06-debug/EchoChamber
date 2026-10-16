@@ -1,8 +1,12 @@
+using System;
 using UnityEngine;
 
 /// Reads the keyboard for the real player and feeds the controller each physics tick.
 public class PlayerInputReader : MonoBehaviour
 {
+    /// Fired every physics tick with the input that was just used (the recorder listens).
+    public event Action<InputFrame> FrameSampled;
+
     RobotController robot;
     bool jumpLatch; // Update sees the key press, FixedUpdate consumes it
 
@@ -15,10 +19,15 @@ public class PlayerInputReader : MonoBehaviour
             jumpLatch = true;
     }
 
-    void FixedUpdate() => robot.Simulate(Sample());
+    void FixedUpdate()
+    {
+        InputFrame frame = Sample();
+        robot.Simulate(frame);
+        FrameSampled?.Invoke(frame);
+    }
 
-    /// Builds this tick's InputFrame. The recorder will call this too.
-    public InputFrame Sample()
+    /// Builds this tick's InputFrame from the keyboard.
+    InputFrame Sample()
     {
         InputFrame f;
         f.move = (Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f);
