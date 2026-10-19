@@ -1141,8 +1141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e592626d67b471245a1ec58fd845d707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
-  levelNumber: 1
-  totalLevels: 4
+  levelNumber: 5
+  totalLevels: 10
 --- !u!4 &2098320688
 Transform:
   m_ObjectHideFlags: 0

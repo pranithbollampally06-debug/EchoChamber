@@ -1142,7 +1142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelNumber: 1
-  totalLevels: 4
+  totalLevels: 10
 --- !u!4 &2098320688
 Transform:
   m_ObjectHideFlags: 0
