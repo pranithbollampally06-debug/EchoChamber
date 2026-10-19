@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// Handles restart (R is for recording, so Backspace restarts), level complete,
-/// and unlocking progress. One per level scene.
+/// Handles restart (Backspace), level complete, and progress. One per level scene.
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance { get; private set; }
 
-    [Tooltip("Scene to load after finishing this level. Leave empty to reload the menu later.")]
-    public string nextSceneName;
+    [Tooltip("This level's number, e.g. 1 for Level1")]
+    public int levelNumber = 1;
+    public int totalLevels = 10;
 
     bool finished;
 
@@ -17,6 +17,7 @@ public class LevelManager : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Backspace)) Restart();
+        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("LevelSelect"); // pause menu comes later
     }
 
     /// Reload the current level instantly (death or manual restart).
@@ -26,18 +27,17 @@ public class LevelManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    /// Level cleared: save progress and load the next scene.
+    /// Level cleared: save progress and move on.
     public void Complete()
     {
         if (finished) return;
         finished = true;
 
-        int next = SceneManager.GetActiveScene().buildIndex + 1;
-        int unlocked = PlayerPrefs.GetInt("HighestUnlocked", 1);
-        PlayerPrefs.SetInt("HighestUnlocked", Mathf.Max(unlocked, next));
+        int unlocked = PlayerPrefs.GetInt("HighestLevel", 1);
+        PlayerPrefs.SetInt("HighestLevel", Mathf.Max(unlocked, levelNumber + 1));
         PlayerPrefs.Save();
 
-        if (!string.IsNullOrEmpty(nextSceneName)) SceneManager.LoadScene(nextSceneName);
-        else Debug.Log("Level complete! (set Next Scene Name to continue)");
+        if (levelNumber >= totalLevels) SceneManager.LoadScene("End");
+        else SceneManager.LoadScene("Level" + (levelNumber + 1));
     }
 }
