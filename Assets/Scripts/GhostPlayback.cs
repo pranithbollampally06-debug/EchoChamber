@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(RobotController))]
 public class GhostPlayback : MonoBehaviour
 {
+    /// Fired whenever a ghost (re)starts its loop, so pulsing doors can stay in sync.
+    public static event System.Action Looped;
+
     public Color tint = new Color(0.5f, 0.8f, 1f, 0.55f);
 
     RobotController robot;
@@ -30,6 +33,7 @@ public class GhostPlayback : MonoBehaviour
         tick = 0;
         robot.ResetState(startPos, startVel);
         IgnorePlayerUntilClear();
+        Looped?.Invoke();
     }
 
     void FixedUpdate()
@@ -42,6 +46,7 @@ public class GhostPlayback : MonoBehaviour
             robot.ResetState(startPos, startVel);
             tick = 0;
             IgnorePlayerUntilClear();
+            Looped?.Invoke();
         }
 
         robot.Simulate(frames[tick++]); // same code path as the player
