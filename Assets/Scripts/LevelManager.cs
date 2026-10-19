@@ -32,6 +32,7 @@ public class LevelManager : MonoBehaviour
     {
         if (finished) return;
         finished = true;
+        AudioManager.Play(Sfx.LevelComplete);
 
         int unlocked = PlayerPrefs.GetInt("HighestLevel", 1);
         PlayerPrefs.SetInt("HighestLevel", Mathf.Max(unlocked, levelNumber + 1));

@@ -14,6 +14,7 @@ public class PulsingDoor : MonoBehaviour
 
     BoxCollider2D box;
     SpriteRenderer sprite;
+    GhostRecorder recorder;
     int tick;
     bool isOpen;
 
@@ -26,15 +27,14 @@ public class PulsingDoor : MonoBehaviour
     void OnEnable()
     {
         GhostPlayback.Looped += ResetClock;
-        var rec = FindFirstObjectByType<GhostRecorder>();
-        if (rec != null) rec.RecordingStarted += ResetClock;
+        recorder = FindAnyObjectByType<GhostRecorder>();
+        if (recorder != null) recorder.RecordingStarted += ResetClock;
     }
 
     void OnDisable()
     {
         GhostPlayback.Looped -= ResetClock;
-        var rec = FindFirstObjectByType<GhostRecorder>();
-        if (rec != null) rec.RecordingStarted -= ResetClock;
+        if (recorder != null) recorder.RecordingStarted -= ResetClock;
     }
 
     void ResetClock() => tick = 0;
@@ -65,7 +65,7 @@ public class PulsingDoor : MonoBehaviour
         isOpen = open;
         box.enabled = !open;
         SetAlpha(open ? 0.2f : 1f);
-        // TODO: door open/close sfx goes here
+        AudioManager.Play(open ? Sfx.DoorOpen : Sfx.DoorClose, 0.4f);
     }
 
     void SetAlpha(float a)

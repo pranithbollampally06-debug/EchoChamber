@@ -20,12 +20,17 @@ public class RobotController : MonoBehaviour
     public LayerMask groundMask;
     public float checkDistance = 0.05f;
 
+    [Header("Audio")]
+    public float sfxVolume = 1f;     // set to ~0.35 on the Ghost prefab
+
     Rigidbody2D rb;
     BoxCollider2D box;
     ContactFilter2D groundFilter;
     readonly Collider2D[] hits = new Collider2D[8];
     int coyoteCounter;
     int bufferCounter;
+    bool wasGrounded;
+    float lastVy;
 
     public bool IsGrounded { get; private set; }
     public Rigidbody2D Body => rb;
@@ -46,6 +51,10 @@ public class RobotController : MonoBehaviour
     {
         IsGrounded = CheckGround();
 
+        // Landing sound only on a real fall, not on tiny bumps
+        if (IsGrounded && !wasGrounded && lastVy < -3f) AudioManager.Play(Sfx.Land, sfxVolume);
+        wasGrounded = IsGrounded;
+
         // Both timers count down in ticks, not seconds, so replays stay deterministic.
         coyoteCounter = IsGrounded ? coyoteTicks : Mathf.Max(0, coyoteCounter - 1);
         bufferCounter = input.jumpPressed ? jumpBufferTicks : Mathf.Max(0, bufferCounter - 1);
@@ -59,12 +68,14 @@ public class RobotController : MonoBehaviour
             v.y = jumpVelocity;
             bufferCounter = 0;
             coyoteCounter = 0;
+            AudioManager.Play(Sfx.Jump, sfxVolume);
         }
 
         // Released early while rising: fall faster for a short hop
         if (v.y > 0f && !input.jumpHeld)
             v.y += Physics2D.gravity.y * gravityScale * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
 
+        lastVy = v.y;
         rb.linearVelocity = v;
     }
 
@@ -77,6 +88,7 @@ public class RobotController : MonoBehaviour
         rb.linearVelocity = velocity;
         coyoteCounter = 0;
         bufferCounter = 0;
+        lastVy = 0f;
     }
 
     /// Box-cast just below the feet, ignoring our own collider.
